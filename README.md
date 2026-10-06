@@ -14,7 +14,7 @@ the spec:
 | Concern | Taken from |
 | --- | --- |
 | Toolsets | The operation's OpenAPI tag (`Flows` → `flows`, `Blueprint Tags` → `blueprint-tags`) |
-| Read vs. write | HTTP method. `GET` is read, plus POSTs named `get*`/`list*`/`search*`/`validate*`/`export*`/`preview*` (e.g. `validateFlows`, `exportFlowsByIds`) |
+| Read vs. write | HTTP method. `GET` is read (except the `triggerExecutionByGetWebhook*` webhook triggers, which start a run), plus POSTs named `get*`/`list*`/`search*`/`validate*`/`export*`/`preview*` (e.g. `validateFlows`, `exportFlowsByIds`) |
 | OSS vs. Enterprise | Kestra's `x-kestra: {edition: ee}` operation extension |
 
 The only spec adjustments happen at load time in [`server.py`](src/kestra_mcp/server.py):
@@ -38,8 +38,8 @@ Filtered tools are never registered, so they can't be called by name either. Eac
 the MCP `readOnlyHint` (and `destructiveHint` for `DELETE`) annotations, plus tags for its toolset
 and `read`/`write`.
 
-With the current spec that is **209 tools for OSS** (108 read-only) and **611 for Enterprise**
-(282 read-only). That is a lot of tools for a client to carry, so narrowing with
+With the current spec that is **209 tools for OSS** (106 read-only) and **611 for Enterprise**
+(280 read-only). That is a lot of tools for a client to carry, so narrowing with
 `KESTRA_TOOLSETS` is worth it, e.g. `flows,executions,logs,kv,namespaces,triggers`.
 
 OSS toolsets: `ai`, `blueprint-tags`, `blueprints`, `dashboards`, `executions`, `expressions`,

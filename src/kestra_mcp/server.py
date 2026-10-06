@@ -31,6 +31,8 @@ SPEC_RESOURCE = resources.files("kestra_mcp.openapi").joinpath("kestra.generated
 # POST endpoints that only read, search, validate, export, or preview (e.g. validateFlows,
 # exportFlowsByIds, getLatestExecutions). previewDispatchApp is excluded: it dispatches an app.
 READ_POST = re.compile(r"^(get|list|search|validate|export|preview(?!Dispatch))")
+# GET endpoints that act: webhook triggers start an execution (triggerExecutionByGetWebhook*).
+WRITE_GET = re.compile(r"^triggerExecution")
 
 _TRUTHY = {"1", "true", "yes", "on"}
 
@@ -41,7 +43,10 @@ def toolset_name(tag: str) -> str:
 
 
 def is_read(route: HTTPRoute) -> bool:
-    return route.method in ("GET", "HEAD") or bool(READ_POST.match(route.operation_id or ""))
+    op_id = route.operation_id or ""
+    if route.method in ("GET", "HEAD"):
+        return not WRITE_GET.match(op_id)
+    return bool(READ_POST.match(op_id))
 
 
 def is_ee_only(route: HTTPRoute) -> bool:
